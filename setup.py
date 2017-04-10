@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='gradify',
-    version='0.2',
+    version='0.3',
     py_modules=['gradify'],
     license='MIT',
     description='A python library to generate CSS gradient from an image',
