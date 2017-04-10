@@ -1,3 +1,4 @@
 *.pyc
 .idea/
 venv/
+gradify.egg-info

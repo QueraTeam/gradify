@@ -15,19 +15,19 @@ class Gradify:
     Main class to do the analysis
     """
 
-    # Cross browser prefixes.
-    BROWSER_PREFIXES = ["", "-webkit-", "-moz-", "-o-", "-ms-"]
+    BROWSER_PREFIXES = [""]
 
     def __init__(self, fp, single_color=False, use_color_spread=False, black_sensitivity=4.3, white_sensitivity=3,
-                 num_colors=4, resize=55, uniformness=7, webkit_only=False):
+                 num_colors=4, resize=55, uniformness=7, use_prefixes=False):
 
         self.MAX_COLORS = num_colors
         self.RESIZE_VAL = resize
         self.UNIFORMNESS = uniformness
         self.spread_quadrants = True
 
-        if webkit_only:
-            self.BROWSER_PREFIXES = ["-webkit-"]
+        if use_prefixes:
+            # Cross browser prefixes.
+            self.BROWSER_PREFIXES = ["", "-webkit-", "-moz-", "-o-", "-ms-"]
 
         self.IGNORED_COLORS = {
             "BLACK": {
@@ -54,8 +54,7 @@ class Gradify:
 
         if self.single_color:
             return col
-            # self.pairs.append((self.num_done, col))
-            # return
+
         quad_cols = [0] * 4
         taken = [0] * 4
         cols_quads = [0] * 4
@@ -93,7 +92,6 @@ class Gradify:
             quad_cols = self.calculate_spread(cols_quads, col)
 
         return quad_cols
-        # self.pairs.append((self.num_done, quad_cols))
 
     @staticmethod
     def calculate_spread(spread_quads, col):
@@ -133,24 +131,25 @@ class Gradify:
 
     def generate_css(self):
         c = self.get_directions()
-        i = 0
-        s = "background:"
         if self.single_color:
-            s += "rgb(" + str(c[0]) + "," + str(c[1]) + "," + str(c[2]) + ");"
+            return "background-color: rgb(%d,%d,%d);" % (c[0], c[1], c[2])
         else:
-            s += "rgb(" + str(c[0][0]) + "," + str(c[0][1]) + "," + str(c[0][2]) + ");"
-            s += "background:"
+            s = "background-color: rgb(%d,%d,%d);" % (c[0][0], c[0][1], c[0][2])
             for prefix in self.BROWSER_PREFIXES:
+                s += "background-image:"
+                i = 0
                 for color in c:
-                    s += prefix + "linear-gradient(" + str(color[3]) + "deg, rgba(" + str(color[0]) + "," + str(
-                        color[1]) + "," + str(color[2]) + "," + str(1) + ") 0%, rgba(" + str(color[0]) + "," + str(
-                        color[1]) + "," + str(color[2]) + ",0) 100%)"
+                    s += prefix + 'linear-gradient({}deg, rgba({},{},{},1) 0%, rgba({},{},{},0) 100%)'.format(
+                        color[3],
+                        color[0], color[1], color[2],
+                        color[0], color[1], color[2],
+                    )
                     i += 1
                     if i == self.MAX_COLORS:
                         s += ";"
                         break
                     s += ","
-        return s
+            return s
 
     def get_colors(self):
         image = self.image.resize((55, 55), Image.ANTIALIAS)
@@ -163,9 +162,9 @@ class Gradify:
         g = h[256:256 * 2]
         b = h[256 * 2: 256 * 3]
         # Rank the histogram in order of appearance
-        self.ranked_colors = sorted(image.getcolors(image.size[0] * image.size[1]), key=itemgetter(0))
-        for i in range(len(self.ranked_colors)):
-            colors.append(self.ranked_colors[len(self.ranked_colors) - 1 - i])
+        ranked_colors = sorted(image.getcolors(image.size[0] * image.size[1]), key=itemgetter(0))
+        for i in range(len(ranked_colors)):
+            colors.append(ranked_colors[len(ranked_colors) - 1 - i])
         if self.MAX_COLORS is 1:
             return colors[0]
         else:
@@ -174,8 +173,11 @@ class Gradify:
     @staticmethod
     def get_rgb_diff(old, new):
         # Currently an approximation of LAB colorspace
-        return abs(1.4 * abs(old[0] - new[0]) ** (1 / 2.0) + .8 * abs(old[1] - new[1]) ** (1 / 2.0) + .8 * abs(
-            old[2] - new[2]) ** (1 / 2.0)) ** (1 / 2.0)
+        return abs(
+            1.4 * abs(old[0] - new[0]) ** (1 / 2.0) +
+            0.8 * abs(old[1] - new[1]) ** (1 / 2.0) +
+            0.8 * abs(old[2] - new[2]) ** (1 / 2.0)
+        ) ** (1 / 2.0)
 
     def find_single_color(self, colors):
         for i in range(len(colors)):
