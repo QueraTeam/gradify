@@ -6,7 +6,7 @@ A python library to generate CSS gradient from an image. This is a fork of
 https://github.com/fraser-hemp/gradify. The original gradify project had only a CLI
 interface. With this fork, you can use gradify as a library in your Python code.
 
-.. image:: https://user-images.githubusercontent.com/2115303/35187515-43bec0c0-fe3a-11e7-8975-4814ebaf932c.jpg
+.. image:: https://user-images.githubusercontent.com/2115303/35187613-c6fe6fe8-fe3b-11e7-9b9d-3e088e460a1d.jpg
 
 Installation
 ============
