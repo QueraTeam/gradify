@@ -2,7 +2,6 @@ from PIL import Image, ImageFilter
 from operator import itemgetter
 import sys
 
-
 """ Image Gradients
 Python 3 module for analysing an image for its 4 most prominent colors, and creating a CSS gradient.
 Original source code: https://github.com/fraser-hemp/gradify
@@ -17,8 +16,8 @@ class Gradify:
 
     BROWSER_PREFIXES = [""]
 
-    def __init__(self, fp, single_color=False, use_color_spread=False, black_sensitivity=4.3, white_sensitivity=3,
-                 num_colors=4, resize=55, uniformness=7, use_prefixes=False):
+    def __init__(self, fp, single_color=False, use_color_spread=False, black_sensitivity=4.3,
+                 white_sensitivity=3, num_colors=4, resize=55, uniformness=7, use_prefixes=False):
 
         self.MAX_COLORS = num_colors
         self.RESIZE_VAL = resize
@@ -45,7 +44,7 @@ class Gradify:
 
         # Uses color's spread in each quadrant rather than it's strength: flattens bell curve of accuracy
         self.use_color_spread = use_color_spread
-        
+
         self.image = Image.open(fp).resize((100, 100), Image.ANTIALIAS)
 
     def get_directions(self):
@@ -225,6 +224,6 @@ class Gradify:
         return selected_colors[0:4]
 
 
-def gradify(fp, single_color=False, use_color_spread=False):
+def generate_css(fp, single_color=False, use_color_spread=False):
     g = Gradify(fp, single_color=single_color, use_color_spread=use_color_spread)
     return g.generate_css()
