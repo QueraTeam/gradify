@@ -45,7 +45,7 @@ class Gradify:
         # Uses color's spread in each quadrant rather than it's strength: flattens bell curve of accuracy
         self.use_color_spread = use_color_spread
 
-        self.image = Image.open(fp).resize((100, 100), Image.ANTIALIAS)
+        self.image = Image.open(fp).resize((100, 100), Image.ANTIALIAS).convert("RGBA")
 
     def get_directions(self):
 
@@ -153,13 +153,13 @@ class Gradify:
     def get_colors(self):
         image = self.image.resize((55, 55), Image.ANTIALIAS)
 
-        h = image.filter(ImageFilter.BLUR)
-        h = h.histogram()
+        # h = image.filter(ImageFilter.BLUR)
+        # h = h.histogram()
         colors = []
-        # split into red, green, blue
-        r = h[0:256]
-        g = h[256:256 * 2]
-        b = h[256 * 2: 256 * 3]
+        # # split into red, green, blue
+        # r = h[0:256]
+        # g = h[256:256 * 2]
+        # b = h[256 * 2: 256 * 3]
         # Rank the histogram in order of appearance
         ranked_colors = sorted(image.getcolors(image.size[0] * image.size[1]), key=itemgetter(0))
         for i in range(len(ranked_colors)):
@@ -196,7 +196,9 @@ class Gradify:
         ignored_radius = 0
         if self.single_color:
             return self.find_single_color(colors)
-        while len(selected_colors) < self.MAX_COLORS:
+        iterations = 0  # to break infinite loop
+        while len(selected_colors) < self.MAX_COLORS and iterations < 20:
+            iterations += 1
             selected_colors = []
             for i in range(len(colors)):
                 bad_color = False
@@ -220,6 +222,10 @@ class Gradify:
             else:
                 sensitivity -= 1
                 ignored_radius = 0
+
+        if len(selected_colors) < 4:
+            self.single_color = True
+            return self.find_single_color(colors)
 
         return selected_colors[0:4]
 
