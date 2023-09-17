@@ -110,14 +110,14 @@ class Gradify:
         # TODO: Make more readable
         while 0 in taken_col:
             best_col = int(strength_spread.index(max(strength_spread)) / 2)
-            if max(strength_spread) is 0:
+            if max(strength_spread) == 0:
                 best_col = taken_col.index(0)
-            if taken_col[best_col] is 0:
+            if taken_col[best_col] == 0:
                 best_quad = spread_quads[best_col].index(max(spread_quads[best_col]))
-                if max(spread_quads[best_col]) is 0:
+                if max(spread_quads[best_col]) == 0:
                     sys.stderr.write(str(spread_quads))
                     best_quad = taken_quads.index(0)
-                if taken_quads[best_quad] is 0:
+                if taken_quads[best_quad] == 0:
                     taken_quads[best_quad] = 1
                     taken_col[best_col] = 1
                     col[best_col] = list(col[best_col])
@@ -164,7 +164,7 @@ class Gradify:
         ranked_colors = sorted(image.getcolors(image.size[0] * image.size[1]), key=itemgetter(0))
         for i in range(len(ranked_colors)):
             colors.append(ranked_colors[len(ranked_colors) - 1 - i])
-        if self.MAX_COLORS is 1:
+        if self.MAX_COLORS == 1:
             return colors[0]
         else:
             return self.find_best_colors(colors)
