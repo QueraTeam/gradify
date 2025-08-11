@@ -17,7 +17,7 @@ setup(
     license='MIT',
     py_modules=['gradify'],
     install_requires=[
-        'Pillow>=4.1.0'
+        'Pillow>=10.0.0',
     ],
     classifiers=[
         'Intended Audience :: Developers',
