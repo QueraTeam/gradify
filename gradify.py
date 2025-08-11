@@ -1,4 +1,4 @@
-from PIL import Image, ImageFilter
+from PIL import Image
 from operator import itemgetter
 import sys
 
@@ -45,7 +45,7 @@ class Gradify:
         # Uses color's spread in each quadrant rather than it's strength: flattens bell curve of accuracy
         self.use_color_spread = use_color_spread
 
-        self.image = Image.open(fp).resize((100, 100), Image.ANTIALIAS).convert("RGBA")
+        self.image = Image.open(fp).resize((100, 100), Image.Resampling.LANCZOS).convert("RGBA")
 
     def get_directions(self):
 
@@ -151,17 +151,11 @@ class Gradify:
             return s
 
     def get_colors(self):
-        image = self.image.resize((55, 55), Image.ANTIALIAS)
+        image = self.image.resize((55, 55), Image.Resampling.LANCZOS)
 
-        # h = image.filter(ImageFilter.BLUR)
-        # h = h.histogram()
-        colors = []
-        # # split into red, green, blue
-        # r = h[0:256]
-        # g = h[256:256 * 2]
-        # b = h[256 * 2: 256 * 3]
         # Rank the histogram in order of appearance
         ranked_colors = sorted(image.getcolors(image.size[0] * image.size[1]), key=itemgetter(0))
+        colors = []
         for i in range(len(ranked_colors)):
             colors.append(ranked_colors[len(ranked_colors) - 1 - i])
         if self.MAX_COLORS == 1:
